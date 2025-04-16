@@ -28,7 +28,7 @@ import RequireUser from './routes/RequireUser';
 import RequireProvider from './routes/RequireProvider';
 import RequireAdmin from './routes/RequireAdmin';
 
-import Home from './pages/Home';
+import Home from './pages/home';
 import About from './pages/About';
 import Notices from './pages/Notices';
 import Entry from './pages/Entry';
