@@ -41,16 +41,14 @@ function Navbar() {
         {isAdmin ? (
           <>
             <NavItem to="/admin" icon="📊" label="대시보드" />
-            <NavItem to="/admin/pending-providers" icon="✅" label="업체 승인" />
-            <NavItem to="/admin/users" icon="👤" label="사용자" />
-            <NavItem to="/admin/providers" icon="🏢" label="업체" />
+            <NavItem to="/admin/pending-providers" icon="✅" label="업체 승인" />           
             <LogoutButton onClick={handleAdminLogout} />
           </>
         ) : isProvider ? (
-          <>
-            <NavItem to="/provider/dashboard" icon="📂" label="내 활동" />
+          <>            
             <NavItem to="/provider/create-activity" icon="➕" label="활동 등록" />
             <NavItem to="/provider/notifications" icon="🔔" label="알림" />
+            <NavItem to="/provider/dashboard" icon="📂" label="내 활동" />
             <LogoutButton onClick={handleLogout} />
           </>
         ) : isUser ? (
@@ -63,7 +61,7 @@ function Navbar() {
           <>
             <NavItem to="/" icon="🏠" label="홈" />
             <NavItem to="/login" icon="📂" label="나의 활동" />
-            <NavItem to="/login" icon="🔑" label="로그인" />
+            <NavItem to="/entry" icon="🔑" label="로그인" />            
           </>
         )}
       </div>

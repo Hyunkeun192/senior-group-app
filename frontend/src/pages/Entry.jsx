@@ -25,18 +25,21 @@ const Entry = () => {
 
       <main className="flex-grow flex flex-col items-center justify-center px-6 py-16 text-center gap-6">
         <h1 className="text-2xl md:text-3xl font-semibold">로그인 유형을 선택해주세요</h1>
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-6 mt-4">
           <button
             onClick={() => navigate('/login')}
-            className="px-6 py-3 border border-gray-300 rounded-md text-sm hover:bg-gray-100 transition"
+            className="w-64 h-40 flex flex-col justify-center items-center border border-gray-300 rounded-xl shadow-sm bg-white hover:bg-gray-100 transition"
           >
-            나의 활동 시작하기
+            <div className="text-4xl mb-2">🧓</div>
+            <div className="text-base font-medium">시니어 로그인</div>
           </button>
+
           <button
             onClick={() => navigate('/provider-login')}
-            className="px-6 py-3 border border-gray-300 rounded-md text-sm hover:bg-gray-100 transition"
+            className="w-64 h-40 flex flex-col justify-center items-center border border-gray-300 rounded-xl shadow-sm bg-white hover:bg-gray-100 transition"
           >
-            활동 준비하시는 분
+            <div className="text-4xl mb-2">🏪</div>
+            <div className="text-base font-medium">업체 로그인</div>
           </button>
         </div>
       </main>
