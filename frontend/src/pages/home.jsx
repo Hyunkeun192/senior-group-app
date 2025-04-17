@@ -7,10 +7,9 @@ import bannerImage2 from '../assets/image2.png';
 import bannerImage3 from '../assets/image3.png';
 import bannerImage4 from '../assets/image4.png';
 import bannerImage5 from '../assets/image5.png';
-import axios from 'axios';
+import API from '../api/axiosInstance'; // ✅ axios 인스턴스 불러오기
 
 const images = [bannerImage1, bannerImage2, bannerImage3, bannerImage4, bannerImage5];
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Home = () => {
   const navigate = useNavigate();
@@ -29,8 +28,9 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ API 호출 부분 수정
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/activities/`)
+    API.get('/activities')
       .then(res => {
         console.log("✅ 활동 데이터:", res.data);
         alert(`✅ 활동 ${res.data.length}건 불러옴`);
