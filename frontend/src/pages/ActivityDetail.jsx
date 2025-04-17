@@ -4,16 +4,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ActivityDetail = () => {
   const { id } = useParams();
   const [activity, setActivity] = useState(null);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const fetchActivity = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const res = await axios.get(`http://localhost:8000/activities/${id}`, {
+        const res = await axios.get(`${API_BASE_URL}/activities/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setActivity(res.data);
@@ -28,7 +31,7 @@ const ActivityDetail = () => {
   const handleParticipate = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.post(`http://localhost:8000/subscriptions`, {
+      await axios.post(`${API_BASE_URL}/subscriptions`, {
         activity_id: id,
       }, {
         headers: { Authorization: `Bearer ${token}` },

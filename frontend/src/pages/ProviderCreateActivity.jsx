@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { interestOptions, regions } from "../utils/constants";
 import { motion } from "framer-motion";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL; // 환경변수에서 API 주소 불러오기
 
 const ProviderCreateActivity = () => {
   const navigate = useNavigate();

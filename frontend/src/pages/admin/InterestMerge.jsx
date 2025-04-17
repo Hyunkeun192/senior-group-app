@@ -3,16 +3,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const InterestMerge = () => {
   const [interests, setInterests] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [mainCategory, setMainCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const token = localStorage.getItem("admin_token");
+  
 
   const fetchCustomInterests = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/admin/custom-interests", {
+      const res = await axios.get(`${API_BASE_URL}/admin/custom-interests`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setInterests(res.data);
@@ -33,9 +36,7 @@ const InterestMerge = () => {
       return;
     }
     try {
-      await axios.post(
-        "http://localhost:8000/admin/group-interests",
-        {
+      await axios.post(`${API_BASE_URL}/admin/group-interests`, {        
           interest_ids: selectedIds,
           category: mainCategory,
           subcategory: subCategory,

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const Mypage = () => {
   const [user, setUser] = useState(null);
   const [myActivities, setMyActivities] = useState([]);
@@ -11,7 +13,7 @@ const Mypage = () => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/auth/me", {
+      const res = await axios.get(`${API_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data);
@@ -22,7 +24,7 @@ const Mypage = () => {
 
   const fetchActivityDetails = async (activityId) => {
     try {
-      const res = await axios.get(`http://localhost:8000/activities/${activityId}`);
+      const res = await axios.get(`${API_BASE_URL}/activities/${activityId}`);
       return res.data;
     } catch (err) {
       console.error("🔥 활동 정보 불러오기 실패", err);
@@ -32,7 +34,7 @@ const Mypage = () => {
 
   const fetchMyActivities = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/subscriptions/me", {
+      const res = await axios.get(`${API_BASE_URL}/subscriptions/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -51,7 +53,7 @@ const Mypage = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/notifications/me", {
+      const res = await axios.get(`${API_BASE_URL}/notifications/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data);
@@ -63,7 +65,7 @@ const Mypage = () => {
   const cancelParticipation = async (subscriptionId) => {
     if (!window.confirm("정말로 참여를 취소하시겠습니까?")) return;
     try {
-      await axios.delete(`http://localhost:8000/subscriptions/${subscriptionId}`, {
+      await axios.delete(`${API_BASE_URL}/subscriptions/${subscriptionId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("참여가 취소되었습니다.");
@@ -77,7 +79,7 @@ const Mypage = () => {
   const handleDeleteAccount = async () => {
     if (!window.confirm("정말로 탈퇴하시겠습니까?")) return;
     try {
-      await axios.delete("http://localhost:8000/users/me", {
+      await axios.delete(`${API_BASE_URL}/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("탈퇴가 완료되었습니다.");

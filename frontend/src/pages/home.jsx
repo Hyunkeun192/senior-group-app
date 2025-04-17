@@ -1,5 +1,3 @@
-// 수정된 전체 home.jsx 코드입니다
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,6 +10,7 @@ import bannerImage5 from '../assets/image5.png';
 import axios from 'axios';
 
 const images = [bannerImage1, bannerImage2, bannerImage3, bannerImage4, bannerImage5];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Home = () => {
   const navigate = useNavigate();
@@ -31,9 +30,16 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/activities/').then(res => {
-      setActivities(res.data);
-    });
+    axios.get(`${API_BASE_URL}/activities/`)
+      .then(res => {
+        console.log("✅ 활동 데이터:", res.data);
+        alert(`✅ 활동 ${res.data.length}건 불러옴`);
+        setActivities(res.data);
+      })
+      .catch(err => {
+        console.error("❌ 활동 API 호출 실패:", err);
+        alert("❌ API 호출 실패: " + err.message);
+      });
   }, []);
 
   const filteredActivities = activities.filter((a) => {
@@ -59,6 +65,7 @@ const Home = () => {
       className="flex flex-col min-h-screen bg-[#FAF9F6] text-gray-800 font-sans"
     >
       <div className="w-full max-w-xl mx-auto mt-20 px-4">
+
         {/* 🔍 검색 바 */}
         <div className="flex items-center w-full border border-gray-300 rounded-full px-4 py-2 shadow-sm mb-6">
           <span className="text-gray-400 mr-2">🔍</span>
@@ -94,7 +101,6 @@ const Home = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(category === selectedCategory ? null : (category === "전체" ? null : category))}
-
               className={`cursor-pointer p-4 rounded-xl border border-gray-300 shadow-sm text-center text-sm transition ${
                 selectedCategory === category ? 'bg-blue-100 border-blue-400' : 'bg-white hover:bg-pink-50'
               }`}
@@ -114,8 +120,7 @@ const Home = () => {
                     case "커뮤니티/친목": return "👥";
                     case "생활기술": return "🛠";
                     default: return "🎯";
-                  }
-                })()}
+                }})()}
               </div>
               <p className="font-medium truncate">{category}</p>
             </motion.div>
@@ -125,19 +130,24 @@ const Home = () => {
         {/* 📦 활동 목록 */}
         <section className="w-full py-6">
           <h2 className="text-lg font-semibold mb-4">{selectedCategory ? `선택한 관심사: ${selectedCategory}` : '진행 중인 활동'}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {filteredActivities.map((a) => (
-              <div
-                key={a.id}
-                onClick={() => handleActivityClick(a.id)}
-                className="bg-white border border-gray-400 rounded-xl p-4 shadow-sm hover:shadow-md hover:bg-green-50 transition cursor-pointer"
-              >
-                <h3 className="text-base font-semibold mb-2 truncate">{a.title}</h3>
-                <p className="text-sm text-gray-500 mb-1">지역: {a.region}</p>
-                <p className="text-sm text-gray-500">참여비: {a.price_per_person?.toLocaleString()}원</p>
-              </div>
-            ))}
-          </div>
+          
+          {filteredActivities.length === 0 ? (
+            <p className="text-sm text-center text-gray-400">표시할 활동이 없습니다.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {filteredActivities.map((a) => (
+                <div
+                  key={a.id}
+                  onClick={() => handleActivityClick(a.id)}
+                  className="bg-white border border-gray-400 rounded-xl p-4 shadow-sm hover:shadow-md hover:bg-green-50 transition cursor-pointer"
+                >
+                  <h3 className="text-base font-semibold mb-2 truncate">{a.title}</h3>
+                  <p className="text-sm text-gray-500 mb-1">지역: {a.region}</p>
+                  <p className="text-sm text-gray-500">참여비: {a.price_per_person?.toLocaleString()}원</p>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </motion.div>

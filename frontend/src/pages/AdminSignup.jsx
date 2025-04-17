@@ -3,16 +3,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function AdminSignup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8000/admin/signup", {
+      const res = await fetch(`${API_BASE_URL}/admin/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

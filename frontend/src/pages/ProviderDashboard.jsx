@@ -9,6 +9,9 @@ import {
 } from "../api/provider";
 import { motion } from "framer-motion";
 
+// ✅ 상단에 환경 변수에서 API 주소 불러오기 추가
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ProviderDashboard = () => {
   const [activities, setActivities] = useState([]);
   const [providerId, setProviderId] = useState(null);
@@ -72,7 +75,7 @@ const ProviderDashboard = () => {
 
     try {
       const token = localStorage.getItem("access_token");
-      await fetch("http://localhost:8000/providers/me", {
+      await fetch(`${API_BASE_URL}/providers/me`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

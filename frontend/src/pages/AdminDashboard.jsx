@@ -7,6 +7,8 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [regionData, setRegionData] = useState([]);
@@ -14,6 +16,7 @@ function AdminDashboard() {
   const [showRegionChart, setShowRegionChart] = useState(false);
   const [showDateChart, setShowDateChart] = useState(false);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
@@ -23,7 +26,7 @@ function AdminDashboard() {
       return;
     }
 
-    fetch("http://localhost:8000/admin/stats/summary", {
+    fetch(`${API_BASE_URL}/admin/stats/summary`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,7 +39,7 @@ function AdminDashboard() {
   const fetchRegionStats = async () => {
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch("http://localhost:8000/admin/stats/users-by-region", {
+      const res = await fetch(`${API_BASE_URL}/admin/stats/users-by-region`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -51,7 +54,7 @@ function AdminDashboard() {
   const fetchRegistrationStats = async () => {
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch("http://localhost:8000/admin/stats/registrations-by-date", {
+      const res = await fetch(`${API_BASE_URL}/admin/stats/registrations-by-date`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

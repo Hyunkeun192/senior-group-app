@@ -3,17 +3,20 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ProviderManagement = () => {
   const [providers, setProviders] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("created_at");
   const [order, setOrder] = useState("desc");
+  
 
   const token = localStorage.getItem("admin_token");
 
   const fetchProviders = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/admin/providers", {
+      const res = await axios.get(`${API_BASE_URL}/admin/providers`, {
         params: { search, sort, order },
         headers: { Authorization: `Bearer ${token}` },
       });

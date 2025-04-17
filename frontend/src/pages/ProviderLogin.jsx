@@ -4,6 +4,8 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ProviderLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +18,7 @@ const ProviderLogin = () => {
       params.append("username", email);
       params.append("password", password);
 
-      const res = await axios.post("http://localhost:8000/providers/login", params, {
+      const res = await axios.post(`${API_BASE_URL}/providers/login`, params, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 

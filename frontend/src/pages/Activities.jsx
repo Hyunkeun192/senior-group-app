@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { regions, interestOptions } from '../utils/constants';
 import { motion } from 'framer-motion';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const Activities = () => {
   const [activities, setActivities] = useState([]);
   const [regionCategory, setRegionCategory] = useState('');
@@ -22,7 +24,7 @@ const Activities = () => {
   const fetchActivities = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get("http://localhost:8000/activities", {
+      const response = await axios.get(`${API_BASE_URL}/activities`, {
         params: {
           region: regionCategory && regionSub ? `${regionCategory} ${regionSub}` : undefined,
           interest: interestSubcategory || undefined

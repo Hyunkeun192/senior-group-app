@@ -3,16 +3,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const PendingProviders = () => {
   const [pending, setPending] = useState([]);
   const [rejectingId, setRejectingId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
+  
 
   const token = localStorage.getItem("admin_token");
 
   const fetchPending = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/admin/pending-providers", {
+      const res = await axios.get(`${API_BASE_URL}/admin/pending-providers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPending(res.data);
@@ -23,7 +26,7 @@ const PendingProviders = () => {
 
   const approve = async (id) => {
     try {
-      await axios.patch(`http://localhost:8000/admin/providers/${id}/approve`, {}, {
+      await axios.patch(`${API_BASE_URL}/admin/providers/${id}/approve`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("승인 완료!");
@@ -35,7 +38,7 @@ const PendingProviders = () => {
 
   const reject = async () => {
     try {
-      await axios.post(`http://localhost:8000/admin/providers/${rejectingId}/reject`, {
+      await axios.post(`${API_BASE_URL}/admin/providers/${rejectingId}/reject`, {
         reason: rejectReason,
       }, {
         headers: { Authorization: `Bearer ${token}` },

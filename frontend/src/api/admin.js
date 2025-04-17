@@ -2,11 +2,12 @@
 
 import axios from 'axios';
 
+// ✅ API_BASE_URL을 .env에서 불러오기
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_BASE_URL, // 🔄 localhost:8000 제거!
 });
 
-// 관리자 JWT 토큰 설정
+// ✅ 관리자 JWT 토큰 자동 첨부
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('admin_token');
   if (token) {
