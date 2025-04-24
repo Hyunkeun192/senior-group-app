@@ -25,7 +25,7 @@ from models.models import Base
 import schemas
 from schemas import UserCreate, UserResponse
 
-app = FastAPI()
+app = FastAPI(root_path="/senior-backend")
 
 # ✅ CORS 설정: 프론트엔드(React)와 연동 허용
 app.add_middleware(

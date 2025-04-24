@@ -9,7 +9,8 @@ from datetime import datetime
 from typing import Optional  # ✅ 추가
 from schemas import ActivityDeadlineUpdate  # ✅ 추가
 
-router = APIRouter()
+# ✅ prefix 추가됨: 이 파일은 /activities 경로 하위로 연결됨
+router = APIRouter(prefix="/activities")
 
 # DB 세션 의존성
 def get_db():
