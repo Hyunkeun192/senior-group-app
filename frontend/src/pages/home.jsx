@@ -7,17 +7,18 @@ import bannerImage2 from '../assets/image2.png';
 import bannerImage3 from '../assets/image3.png';
 import bannerImage4 from '../assets/image4.png';
 import bannerImage5 from '../assets/image5.png';
-import API from '../api/axiosInstance'; // ✅ axios 인스턴스 불러오기
+import API from '../api/axiosInstance';
 
 const images = [bannerImage1, bannerImage2, bannerImage3, bannerImage4, bannerImage5];
 
 const Home = () => {
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState([]);  // ✅ 빈 배열로 초기화
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState(null);  // ✅ 에러 상태 추가
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 
@@ -28,25 +29,24 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ API 호출 부분 수정
+  // ✅ API 호출
   useEffect(() => {
-    API.get('/activities')
+    API.get('/activities/')
       .then(res => {
         console.log("✅ 활동 데이터:", res.data);
-        alert(`✅ 활동 ${res.data.length}건 불러옴`);
         setActivities(res.data);
       })
       .catch(err => {
         console.error("❌ 활동 API 호출 실패:", err);
-        alert("❌ API 호출 실패: " + err.message);
+        setError(err.message || "API 호출 실패");
       });
   }, []);
 
-  const filteredActivities = activities.filter((a) => {
+  const filteredActivities = Array.isArray(activities) ? activities.filter((a) => {
     const matchCategory = selectedCategory ? a.interest_category === selectedCategory : true;
     const matchSearch = searchKeyword ? a.title.includes(searchKeyword) || a.description.includes(searchKeyword) : true;
     return matchCategory && matchSearch;
-  });
+  }) : [];
 
   const handleActivityClick = (activityId) => {
     if (!isLoggedIn) {
@@ -131,7 +131,9 @@ const Home = () => {
         <section className="w-full py-6">
           <h2 className="text-lg font-semibold mb-4">{selectedCategory ? `선택한 관심사: ${selectedCategory}` : '진행 중인 활동'}</h2>
           
-          {filteredActivities.length === 0 ? (
+          {error ? (
+            <p className="text-red-500 text-sm text-center">🚫 활동 목록을 불러오는 중 오류가 발생했습니다: {error}</p>
+          ) : filteredActivities.length === 0 ? (
             <p className="text-sm text-center text-gray-400">표시할 활동이 없습니다.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -6,10 +6,10 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from fastapi.middleware.cors import CORSMiddleware  # ✅ CORS 미들웨어 추가
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
-# ✅ import 방식 변경 (절대 경로 → 상대 경로)
+# ✅ import 모듈들
 from routers.users import router as users_router
 from routers.auth import router as auth_router
 from routers.providers import router as providers_router
@@ -25,18 +25,22 @@ from models.models import Base
 import schemas
 from schemas import UserCreate, UserResponse
 
+# ✅ FastAPI 앱 생성 (배포 환경 root_path 포함)
 app = FastAPI(root_path="/senior-backend")
 
-# ✅ CORS 설정: 프론트엔드(React)와 연동 허용
+# ✅ CORS 설정: 로컬 + Netlify 모두 허용
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://inspiring-cat-20b218.netlify.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ DB 테이블 생성
+# ✅ DB 테이블 자동 생성
 Base.metadata.create_all(bind=engine)
 
 # ✅ 라우터 등록
@@ -50,11 +54,12 @@ app.include_router(notifications_router)
 app.include_router(admin_router)
 app.include_router(payments_router)
 
+# ✅ 기본 루트 확인용
 @app.get("/")
 def home():
     return {"message": "Hello from FastAPI!"}
 
-# ✅ Swagger UI에서 Bearer Token을 사용하도록 설정 (Authorize 버튼 추가)
+# ✅ Swagger UI: Bearer Token 사용 설정
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -80,7 +85,6 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     return openapi_schema
 
-# ✅ Swagger UI에서 Bearer Token을 인식하도록 반영
 app.openapi = custom_openapi
 
 # ✅ AWS Lambda 연동용 핸들러
