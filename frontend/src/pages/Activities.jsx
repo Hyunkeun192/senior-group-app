@@ -1,11 +1,10 @@
 // src/pages/Activities.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axiosInstance'; // ✅ axiosInstance import
 import { useNavigate } from 'react-router-dom';
-import { regions, interestOptions } from '../utils/constants';
+import { regionMap } from '../utils/regionMap';
+import { interestMap } from '../utils/interestMap';
 import { motion } from 'framer-motion';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Activities = () => {
   const [activities, setActivities] = useState([]);
@@ -15,26 +14,23 @@ const Activities = () => {
   const [interestSubcategory, setInterestSubcategory] = useState('');
   const navigate = useNavigate();
 
-  const regionCategories = Object.keys(regions);
-  const regionSubs = regionCategory ? regions[regionCategory] : [];
-
-  const interestCategories = Object.keys(interestOptions);
-  const interestSubs = interestCategory ? interestOptions[interestCategory] : [];
+  const regionCategories = Array.from(regionMap.keys());
+  const regionSubs = regionCategory ? regionMap.get(regionCategory) : [];
+  const interestCategories = Array.from(interestMap.keys());
+  const interestSubs = interestCategory ? interestMap.get(interestCategory) : [];
 
   const fetchActivities = async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get(`${API_BASE_URL}/activities`, {
+      const response = await API.get('/activities', {
         params: {
           region: regionCategory && regionSub ? `${regionCategory} ${regionSub}` : undefined,
-          interest: interestSubcategory || undefined
+          interest: interestSubcategory || undefined,
         },
-        headers: { Authorization: `Bearer ${token}` }
-        
       });
       setActivities(response.data);
     } catch (error) {
       console.error("활동 목록 불러오기 실패:", error);
+      alert("활동 목록을 불러오는 데 실패했습니다.");
     }
   };
 
@@ -118,10 +114,9 @@ const Activities = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {activities.map((activity) => (
           <div
-            key={activity.activity_id}
+            key={activity.id}
             className="bg-white border border-gray-200 rounded-lg p-6 cursor-pointer hover:shadow-sm transition"
             onClick={() => navigate(`/activities/${activity.id}`)}
-
           >
             <h3 className="text-lg font-semibold mb-1">{activity.title}</h3>
             <p className="text-sm text-gray-600">📍 지역: {activity.region}</p>

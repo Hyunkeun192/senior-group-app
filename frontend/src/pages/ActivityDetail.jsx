@@ -1,24 +1,18 @@
 // src/pages/ActivityDetail.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/axiosInstance'; // ✅ axiosInstance import
 import { motion } from 'framer-motion';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ActivityDetail = () => {
   const { id } = useParams();
   const [activity, setActivity] = useState(null);
   const navigate = useNavigate();
-  
 
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const token = localStorage.getItem("access_token");
-        const res = await axios.get(`${API_BASE_URL}/activities/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await API.get(`/activities/${id}`);
         setActivity(res.data);
       } catch (err) {
         console.error("활동 정보를 불러오지 못했습니다.", err);
@@ -30,13 +24,7 @@ const ActivityDetail = () => {
 
   const handleParticipate = async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      await axios.post(`${API_BASE_URL}/subscriptions`, {
-        activity_id: id,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      await API.post('/subscriptions', { activity_id: id });
       alert("참여 신청이 완료되었습니다!");
       navigate('/mypage');
     } catch (err) {

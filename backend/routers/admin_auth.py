@@ -11,6 +11,7 @@ router = APIRouter(prefix="/admin", tags=["Admin Login"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# ✅ 관리자 로그인
 @router.post("/login", response_model=TokenResponse)
 def admin_login(login_req: AdminLoginRequest = Body(...), db: Session = Depends(get_db)):
     admin = db.query(Admin).filter(Admin.email == login_req.email).first()
@@ -22,6 +23,7 @@ def admin_login(login_req: AdminLoginRequest = Body(...), db: Session = Depends(
     token = create_admin_access_token({"sub": str(admin.id)})
     return {"access_token": token, "token_type": "bearer"}
 
+# ✅ 관리자 회원가입
 @router.post("/signup")
 def admin_signup(request: AdminSignupRequest, db: Session = Depends(get_db)):
     existing_admin = db.query(Admin).filter(Admin.email == request.email).first()
@@ -30,7 +32,7 @@ def admin_signup(request: AdminSignupRequest, db: Session = Depends(get_db)):
 
     new_admin = Admin(
         email=request.email,
-        password_hash=pwd_context.hash(request.password)  # ✅ 수정 포인트!
+        password_hash=pwd_context.hash(request.password)
     )
     db.add(new_admin)
     db.commit()

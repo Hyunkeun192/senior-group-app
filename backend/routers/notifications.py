@@ -5,19 +5,19 @@ from datetime import datetime
 from database import get_db
 from models.models import Notification
 from schemas import NotificationCreate, NotificationResponse
-from auth_utils import get_current_user, get_current_provider  # ✅ 경로 수정
+from auth_utils import get_current_user, get_current_provider
 
 router = APIRouter(
     prefix="/notifications",
     tags=["Notifications"]
 )
 
-# 1️⃣ 알림 생성 API
+# 1️⃣ 알림 생성
 @router.post("/", response_model=NotificationResponse)
 def create_notification(notification: NotificationCreate, db: Session = Depends(get_db)):
     new_notification = Notification(
         user_id=notification.user_id,
-        provider_id=notification.provider_id,  # ✅ optional
+        provider_id=notification.provider_id,
         message=notification.message,
         created_at=datetime.utcnow()
     )
@@ -43,14 +43,14 @@ def mark_notification_as_read(notification_id: int, db: Session = Depends(get_db
     ).first()
     
     if not notification:
-        raise HTTPException(status_code=404, detail="Notification not found")
+        raise HTTPException(status_code=404, detail="알림을 찾을 수 없습니다.")
     
     notification.is_read = True
     db.commit()
     db.refresh(notification)
     return notification
 
-# ✅ 4️⃣ provider 본인 알림 조회 (토큰 인증 보호됨)
+# 4️⃣ provider 본인 알림 조회
 @router.get("/provider/me", response_model=list[NotificationResponse])
 def get_notifications_for_provider_me(
     db: Session = Depends(get_db),

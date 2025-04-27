@@ -1,50 +1,43 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { regions, interestOptions } from "../utils/constants";
+import { regionMap } from "../utils/regionMap";
+import { interestMap } from "../utils/interestMap";
 
-const steps = ["기본 정보", "연락처 및 지역", "관심사"];
+const steps = [
+  "서비스 이용 동의", "이름 입력", "이메일 입력", "비밀번호 입력",
+  "전화번호 입력", "관심사 선택", "가입 완료"
+];
 
 function Signup() {
   const [step, setStep] = useState(0);
+  const [agreed, setAgreed] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
-    age: "",
-    region: "",
-    district: "",
-    selectedCategories: [],
-    selectedSubcategories: [],
-    customInterest: "",
+    interests: []
   });
-  const [phoneValid, setPhoneValid] = useState(true);
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleCategorySelect = (category) => {
-    if (!form.selectedCategories.includes(category) && form.selectedCategories.length < 5) {
-      handleChange("selectedCategories", [...form.selectedCategories, category]);
-    }
+  const handleNext = () => {
+    setStep((prev) => prev + 1);
   };
 
-  const handleSubcategorySelect = (subcategory) => {
-    if (!form.selectedSubcategories.includes(subcategory) && form.selectedSubcategories.length < 5) {
-      handleChange("selectedSubcategories", [...form.selectedSubcategories, subcategory]);
-    }
+  const handlePrev = () => {
+    setStep((prev) => prev - 1);
   };
 
   const handleSubmit = async () => {
     const requestData = {
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      phone: form.phone,
-      age: parseInt(form.age),
-      location: `${form.region} ${form.district}`,
-      interests: form.selectedSubcategories.join(", "),
+      ...form,
+      birth: `${birthYear}-${String(birthMonth).padStart(2, "0")}`,
+      interests: form.interests.join(", "),
     };
 
     const res = await fetch("http://localhost:8000/users/", {
@@ -54,180 +47,220 @@ function Signup() {
     });
 
     if (res.ok) {
-      alert("회원가입 성공! 로그인 페이지로 이동합니다.");
-      window.location.href = "/login";
+      handleNext();
     } else {
       alert("회원가입 실패");
     }
   };
 
-  const isValidPhone = (value) => /^\d{3}-\d{4}-\d{4}$/.test(value);
+  const beige = "#EAD7C2";
+  const beigeHover = "#d9c2a7";
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
-      <div className="w-full max-w-2xl bg-white border rounded-lg p-6">
-        {/* 단계 인디케이터 */}
-        <div className="flex justify-center gap-4 mb-6">
-          {steps.map((label, index) => (
-            <div
-              key={index}
-              className={`text-sm font-medium px-3 py-1 rounded-full ${
-                step === index ? "bg-green-600 text-white" : "bg-gray-200"
-              }`}
-            >
-              {index + 1}. {label}
-            </div>
-          ))}
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.4 }}
+      className="min-h-screen bg-[#FAF9F6] flex items-center justify-center"
+    >
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg p-8 text-center">
+        {/* 상단 타이틀 */}
+        <h2 className="text-xl font-semibold mb-6">{steps[step]}</h2>
 
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              key="step0"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
               className="flex flex-col gap-4"
             >
-              <input placeholder="이름" className="p-2 border rounded" value={form.name} onChange={(e) => handleChange("name", e.target.value)} />
-              <input placeholder="이메일" className="p-2 border rounded" value={form.email} onChange={(e) => handleChange("email", e.target.value)} />
-              <input type="password" placeholder="비밀번호" className="p-2 border rounded" value={form.password} onChange={(e) => handleChange("password", e.target.value)} />
+              <p className="text-gray-600 mb-4">서비스 이용약관에 동의해주세요.</p>
+
+              <div className="flex items-center justify-center gap-2">
+                <input
+                  type="checkbox"
+                  id="agree"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                />
+                <label htmlFor="agree" className="text-sm text-gray-700">
+                  전체 약관에 동의합니다.
+                </label>
+              </div>
             </motion.div>
           )}
 
           {step === 1 && (
             <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              key="step1"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
               className="flex flex-col gap-4"
             >
               <input
-                placeholder="전화번호 (000-0000-0000)"
-                className="p-2 border rounded"
-                value={form.phone}
-                onChange={(e) => {
-                  handleChange("phone", e.target.value);
-                  setPhoneValid(isValidPhone(e.target.value));
-                }}
+                type="text"
+                placeholder="이름을 입력하세요"
+                value={form.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
-              {!phoneValid && <p className="text-sm text-red-500">전화번호 형식이 올바르지 않습니다. 000-0000-0000 형식으로 입력해 주세요.</p>}
-              <input placeholder="나이" className="p-2 border rounded" value={form.age} onChange={(e) => handleChange("age", e.target.value)} />
-              <select className="p-2 border rounded" value={form.region} onChange={(e) => handleChange("region", e.target.value)}>
-                <option value="">도/광역시 선택</option>
-                {Object.keys(regions).map((r) => <option key={r}>{r}</option>)}
-              </select>
-              {form.region && (
-                <select className="p-2 border rounded" value={form.district} onChange={(e) => handleChange("district", e.target.value)}>
-                  <option value="">시/군/구 선택</option>
-                  {regions[form.region].map((d) => <option key={d}>{d}</option>)}
-                </select>
-              )}
             </motion.div>
           )}
 
           {step === 2 && (
             <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
+              key="step2"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col gap-4"
             >
-              <div className="mb-4">
-                <label className="block mb-1 font-medium">관심사 대분류 (최대 5개)</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {Object.keys(interestOptions).map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => handleCategorySelect(cat)}
-                      className={`p-4 rounded-xl border text-center text-sm shadow-sm ${
-                        form.selectedCategories.includes(cat) ? "bg-green-200 border-green-400" : "bg-white hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="text-2xl mb-2">{categoryToEmoji(cat)}</div>
-                      <div className="font-semibold">{cat}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <input
+                type="email"
+                placeholder="이메일을 입력하세요"
+                value={form.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+            </motion.div>
+          )}
 
-              {form.selectedCategories.length > 0 && (
-                <div className="mb-4">
-                  <label className="block mb-1 font-medium">관심사 소분류 (최대 5개)</label>
-                  <div className="space-y-4">
-                    {form.selectedCategories.map((cat) => (
-                      <div key={cat}>
-                        <div className="text-sm font-semibold text-gray-600 border-b pb-1 mb-2">{cat}</div>
-                        <div className="flex flex-wrap gap-2">
-                          {interestOptions[cat].map((sub) => (
-                            <button
-                              key={sub}
-                              onClick={() => handleSubcategorySelect(sub)}
-                              className={`px-3 py-1 text-sm rounded border ${
-                                form.selectedSubcategories.includes(sub)
-                                  ? "bg-green-200 border-green-400"
-                                  : "bg-white hover:bg-gray-100"
-                              }`}
-                            >
-                              {sub}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col gap-4"
+            >
+              <input
+                type="password"
+                placeholder="비밀번호를 입력하세요"
+                value={form.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col gap-4"
+            >
+              <input
+                type="text"
+                placeholder="전화번호 (000-0000-0000)"
+                value={form.phone}
+                onChange={(e) => handleChange("phone", e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+            </motion.div>
+          )}
+
+          {step === 5 && (
+            <motion.div
+              key="step5"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col gap-4"
+            >
+              <div className="text-sm mb-2 text-gray-600">관심사를 선택하세요 (최대 5개)</div>
+              <div className="grid grid-cols-2 gap-3">
+                {Array.from(interestMap.keys()).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      if (!form.interests.includes(cat) && form.interests.length < 5) {
+                        handleChange("interests", [...form.interests, cat]);
+                      }
+                    }}
+                    className={`p-2 border rounded text-sm ${form.interests.includes(cat)
+                        ? "bg-green-200 border-green-400"
+                        : "bg-white hover:bg-gray-50"
+                      }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {step === 6 && (
+            <motion.div
+              key="step6"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col gap-4 items-center justify-center"
+            >
+              <p className="text-green-600 text-lg font-semibold mb-4">
+                🎉 가입이 완료되었습니다!
+              </p>
+              <p className="text-gray-600 text-sm">환영합니다. 이제 서비스를 시작할 수 있어요!</p>
+              <button
+                onClick={() => window.location.href = "/login"}
+                className="mt-6 w-40 py-2 rounded bg-[#EAD7C2] hover:bg-[#d9c2a7] text-gray-800 font-semibold transition"
+              >
+                로그인하러 가기
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* 하단 버튼 */}
-        <div className="mt-8 text-center">
-          {step > 0 && (
-            <button onClick={() => setStep(step - 1)} className="mr-2 px-4 py-2 border rounded">이전</button>
-          )}
-          {step < 2 ? (
+        {/* 하단 버튼 (이전/다음) */}
+        <div className="flex justify-between mt-8">
+          {step > 0 && step < 6 && (
             <button
-              onClick={() => {
-                if (step === 1 && !isValidPhone(form.phone)) {
-                  alert("전화번호를 000-0000-0000 형식으로 입력해 주세요.");
-                  return;
-                }
-                setStep(step + 1);
+              onClick={handlePrev}
+              className="w-32 border border-gray-400 text-sm py-2 rounded hover:bg-gray-100 transition"
+            >
+              이전
+            </button>
+          )}
+          <div className="flex-1" />
+          {step < 5 && (
+            <button
+              onClick={handleNext}
+              disabled={step === 0 && !agreed}
+              style={{
+                backgroundColor: agreed || step > 0 ? "#EAD7C2" : "#eee",
+                color: "#555",
               }}
-              className="px-4 py-2 border rounded bg-[#66bb6a] text-white"
+              className="w-32 text-sm py-2 rounded hover:bg-[#d9c2a7] transition"
             >
               다음
             </button>
-          ) : (
-            <button onClick={handleSubmit} className="px-4 py-2 border rounded bg-[#43a047] text-white">회원가입 완료</button>
+          )}
+          {step === 5 && (
+            <button
+              onClick={handleSubmit}
+              className="w-32 text-sm py-2 rounded bg-[#EAD7C2] hover:bg-[#d9c2a7] transition"
+            >
+              회원가입 완료
+            </button>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-function categoryToEmoji(category) {
-  switch (category) {
-    case "운동/스포츠": return "🏃";
-    case "예술/취미": return "🎨";
-    case "음악/공연": return "🎵";
-    case "건강/웰빙": return "🧘";
-    case "여행/산책/나들이": return "🧳";
-    case "봉사/사회참여": return "🤝";
-    case "교육/자기계발": return "📘";
-    case "요리/식생활": return "🍳";
-    case "반려동물/가드닝": return "🌿";
-    case "커뮤니티/친목": return "👥";
-    case "생활기술": return "🛠";
-    default: return "🎯";
-  }
-}
-
 export default Signup;
+

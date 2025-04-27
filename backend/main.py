@@ -19,6 +19,7 @@ from routers.notifications import router as notifications_router
 from routers.admin_auth import router as admin_auth_router
 from routers.admin import router as admin_router
 from routers.payments import router as payments_router
+from routers.weather import router as weather_router  # ✅ 추가
 
 from database import engine
 from models.models import Base
@@ -45,7 +46,7 @@ Base.metadata.create_all(bind=engine)
 
 # ✅ 라우터 등록
 app.include_router(users_router)
-app.include_router(auth_router, prefix="/auth")  # 🔥 prefix 추가
+app.include_router(auth_router, prefix="/auth")
 app.include_router(admin_auth_router)
 app.include_router(providers_router)
 app.include_router(activities_router)
@@ -53,6 +54,7 @@ app.include_router(subscriptions_router)
 app.include_router(notifications_router)
 app.include_router(admin_router)
 app.include_router(payments_router)
+app.include_router(weather_router)  # ✅ weather 라우터 추가
 
 # ✅ 기본 루트 확인용
 @app.get("/")

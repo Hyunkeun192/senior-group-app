@@ -1,21 +1,16 @@
 // src/pages/Mypage.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axiosInstance'; // ✅ axiosInstance import
 import { motion } from 'framer-motion';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Mypage = () => {
   const [user, setUser] = useState(null);
   const [myActivities, setMyActivities] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const token = localStorage.getItem("access_token");
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await API.get('/auth/me');
       setUser(res.data);
     } catch (err) {
       console.error("사용자 정보 불러오기 실패:", err);
@@ -24,7 +19,7 @@ const Mypage = () => {
 
   const fetchActivityDetails = async (activityId) => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/activities/${activityId}`);
+      const res = await API.get(`/activities/${activityId}`);
       return res.data;
     } catch (err) {
       console.error("🔥 활동 정보 불러오기 실패", err);
@@ -34,9 +29,7 @@ const Mypage = () => {
 
   const fetchMyActivities = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/subscriptions/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await API.get('/subscriptions/me');
 
       const enriched = await Promise.all(
         res.data.map(async (sub) => {
@@ -53,9 +46,7 @@ const Mypage = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/notifications/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await API.get('/notifications/me');
       setNotifications(res.data);
     } catch (err) {
       console.error("알림 목록 불러오기 실패:", err);
@@ -65,9 +56,7 @@ const Mypage = () => {
   const cancelParticipation = async (subscriptionId) => {
     if (!window.confirm("정말로 참여를 취소하시겠습니까?")) return;
     try {
-      await axios.delete(`${API_BASE_URL}/subscriptions/${subscriptionId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await API.delete(`/subscriptions/${subscriptionId}`);
       alert("참여가 취소되었습니다.");
       fetchMyActivities();
     } catch (err) {
@@ -79,14 +68,13 @@ const Mypage = () => {
   const handleDeleteAccount = async () => {
     if (!window.confirm("정말로 탈퇴하시겠습니까?")) return;
     try {
-      await axios.delete(`${API_BASE_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await API.delete('/users/me');
       alert("탈퇴가 완료되었습니다.");
       localStorage.clear();
       window.location.href = "/login";
     } catch (err) {
       alert("탈퇴 중 오류가 발생했습니다.");
+      console.error(err);
     }
   };
 
@@ -153,7 +141,6 @@ const Mypage = () => {
                       <button
                         onClick={() => {
                           alert("결제 처리 로직 연결 예정!");
-                          // 실제 결제 페이지로 이동하거나 결제 API 연동 필요
                           // window.location.href = `/payments/pay/${item.id}`;
                         }}
                         className="text-sm border border-green-500 text-green-600 px-3 py-1 rounded hover:bg-green-50"
@@ -178,9 +165,8 @@ const Mypage = () => {
               {notifications.map((n) => (
                 <li
                   key={n.id}
-                  className={`flex items-start gap-3 border p-4 rounded-lg shadow-sm ${
-                    n.status === "unread" ? "bg-yellow-50 border-yellow-300" : "bg-white border-gray-200"
-                  }`}
+                  className={`flex items-start gap-3 border p-4 rounded-lg shadow-sm ${n.status === "unread" ? "bg-yellow-50 border-yellow-300" : "bg-white border-gray-200"
+                    }`}
                 >
                   <div className="text-lg">{getIcon(n.message)}</div>
                   <div className="flex-1">

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { regions as REGIONS } from "../utils/constants";
+import { regionMap as REGIONS } from "../utils/regionMap";
 import { motion } from "framer-motion";
 
 const ProviderSignup = () => {

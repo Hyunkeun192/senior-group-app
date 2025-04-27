@@ -1,12 +1,24 @@
-// 이 코드는 공통 axios 인스턴스를 생성해 API 호출에 사용할 수 있도록 설정합니다.
+// 이 코드는 Axios 인스턴스를 생성하고 모든 요청에 JWT 토큰을 자동 첨부하기 위한 설정입니다.
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000", // ✅ 환경변수 기반 서버 URL
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // 인증이 필요한 요청에 쿠키를 포함하기 위해 사용됩니다.
+  withCredentials: false, // ✅ 쿠키 인증 대신 JWT 토큰을 헤더로 처리
 });
+
+// ✅ 요청 보내기 전 Authorization 헤더 자동 첨부
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token") || localStorage.getItem("admin_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default API;

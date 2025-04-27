@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { interestOptions, regions } from "../utils/constants";
+import { interestMap } from "../utils/interestMap";
+import { regionMap } from "../utils/regionMap";
 import { motion } from "framer-motion";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL; // 환경변수에서 API 주소 불러오기
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ProviderCreateActivity = () => {
   const navigate = useNavigate();
@@ -20,8 +21,11 @@ const ProviderCreateActivity = () => {
   const [regionCategory, setRegionCategory] = useState("");
   const [regionSub, setRegionSub] = useState("");
 
-  const regionCategories = Object.keys(regions);
-  const regionSubs = regionCategory ? regions[regionCategory] : [];
+  const regionCategories = Array.from(regionMap.keys());
+  const regionSubs = regionCategory ? regionMap.get(regionCategory) || [] : [];
+
+  const interestCategories = Array.from(interestMap.keys());
+  const interestSubs = formData.interest_category ? interestMap.get(formData.interest_category) || [] : [];
 
   const token = localStorage.getItem("access_token");
 
@@ -75,8 +79,6 @@ const ProviderCreateActivity = () => {
     }
   };
 
-  const subcategories = interestOptions[formData.interest_category] || [];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -88,6 +90,7 @@ const ProviderCreateActivity = () => {
       <div className="max-w-2xl mx-auto bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
         <h2 className="text-xl font-semibold mb-6 text-center">📌 활동 등록</h2>
         <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+          {/* 제목 */}
           <div>
             <label className="block mb-1 font-medium">활동 제목</label>
             <input
@@ -100,6 +103,7 @@ const ProviderCreateActivity = () => {
             />
           </div>
 
+          {/* 설명 */}
           <div>
             <label className="block mb-1 font-medium">활동 설명</label>
             <textarea
@@ -112,7 +116,7 @@ const ProviderCreateActivity = () => {
             />
           </div>
 
-          {/* ✅ 지역 선택 */}
+          {/* 지역 선택 */}
           <div>
             <label className="block mb-1 font-medium">활동 지역 (도/광역시)</label>
             <select
@@ -148,6 +152,7 @@ const ProviderCreateActivity = () => {
             </div>
           )}
 
+          {/* 관심사 선택 */}
           <div>
             <label className="block mb-1 font-medium">관심사 대분류</label>
             <select
@@ -158,7 +163,7 @@ const ProviderCreateActivity = () => {
               required
             >
               <option value="">선택하세요</option>
-              {Object.keys(interestOptions).map((cat) => (
+              {interestCategories.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
@@ -175,12 +180,13 @@ const ProviderCreateActivity = () => {
               required
             >
               <option value="">선택하세요</option>
-              {subcategories.map((sub) => (
+              {interestSubs.map((sub) => (
                 <option key={sub} value={sub}>{sub}</option>
               ))}
             </select>
           </div>
 
+          {/* 모집 조건 */}
           <div>
             <label className="block mb-1 font-medium">최소 참여 인원</label>
             <input
@@ -195,7 +201,7 @@ const ProviderCreateActivity = () => {
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">마감일</label>
+            <label className="block mb-1 font-medium">모집 마감일</label>
             <input
               type="date"
               name="deadline"
@@ -220,6 +226,7 @@ const ProviderCreateActivity = () => {
             />
           </div>
 
+          {/* 제출 버튼 */}
           <button
             type="submit"
             className="w-full border border-gray-400 text-sm py-2 rounded hover:bg-gray-100 transition"

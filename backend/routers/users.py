@@ -1,20 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import crud
-from database import SessionLocal
+from database import get_db  # ✅ get_db 직접 import
 from auth_utils import get_current_user  # ✅ 로그인 유저 의존성 주입
-from schemas import UserCreate, UserResponse, UserUpdate, CustomInterestCreate  # ✅ schemas 직접 import
+from schemas import UserCreate, UserResponse, UserUpdate, CustomInterestCreate  # ✅ schemas import
 from models.models import CustomInterest
 
 router = APIRouter()
-
-# ✅ DB 세션 의존성
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # ✅ 사용자 회원가입 API (중복 이메일 방지)
 @router.post("/users/", response_model=UserResponse)
@@ -34,7 +26,7 @@ def read_users_me(current_user = Depends(get_current_user)):
 def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_id(db, user_id)
     if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
     return db_user
 
 # ✅ 사용자 정보 수정 API
@@ -46,7 +38,7 @@ def update_user_me(
 ):
     updated_user = crud.update_user(db, current_user.id, user_update)
     if not updated_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
     return updated_user
 
 # ✅ 사용자 삭제 API
@@ -57,10 +49,10 @@ def delete_user_me(
 ):
     deleted_user = crud.delete_user(db, current_user.id)
     if not deleted_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
     return deleted_user
 
-# ✅ 사용자 주관식 관심사 등록 API (🔓 인증 없이 누구나 접근 가능)
+# ✅ 사용자 주관식 관심사 등록 API
 @router.post("/custom-interests")
 def create_custom_interest(
     interest: CustomInterestCreate,
